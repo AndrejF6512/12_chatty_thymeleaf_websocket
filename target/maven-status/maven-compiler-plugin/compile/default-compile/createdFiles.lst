@@ -1,0 +1,9 @@
+com\foltan\chat\config\MessageEncoder.class
+com\foltan\chat\controller\ChatController.class
+com\foltan\chat\ChattyApplication.class
+com\foltan\chat\component\WebSocketChatServer.class
+com\foltan\chat\controller\ChattingApiController.class
+com\foltan\chat\model\User.class
+com\foltan\chat\config\WebSocketConfig.class
+com\foltan\chat\config\MessageDecoder.class
+com\foltan\chat\model\Message.class

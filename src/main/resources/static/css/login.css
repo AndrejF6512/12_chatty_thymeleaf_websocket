@@ -1,0 +1,71 @@
+body {
+  background-image: url("background.jpg");
+  background-color: #cccccc;
+  height: auto;
+  width: auto;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+}
+
+html,body {
+  font-family: 'Open Sans', serif;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.fixed-bg {
+  /* The background image */
+  background-image: url("background.jpg");
+
+  /* Set a specified height, or the minimum height for the background image */
+  min-height: 500px;
+
+  /* Set background image to fixed (don't scroll along with the page) */
+  background-attachment: fixed;
+
+  /* Center the background image */
+  background-position: center;
+
+  /* Set the background image to no repeat */
+  background-repeat: no-repeat;
+
+  /* Scale the background image to be as large as possible */
+  background-size: cover;
+}
+
+.button {
+  background-color: #4ae86d;
+}
+
+.hero.is-success {
+  background: #22cae3;
+}
+.hero .nav, .hero.is-success .nav {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.box {
+  margin-top: 5rem;
+}
+.avatar {
+  margin-top: -70px;
+  padding-bottom: 20px;
+}
+.avatar img {
+  padding: 5px;
+  background: #fff;
+  border-radius: 50%;
+  -webkit-box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+  box-shadow: 0 2px 3px rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.1);
+}
+input {
+  font-weight: 300;
+}
+p {
+  font-weight: 700;
+}
+p.subtitle {
+  padding-top: 1rem;
+}

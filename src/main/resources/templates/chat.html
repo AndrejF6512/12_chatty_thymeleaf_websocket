@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title><h3>Chatty</h3></title>
+    <meta charset="utf-8" name="viewport" content="width=device-width">
+    <link href="/chatty/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/chat.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/webjars/mdui/dist/css/mdui.css}">
+    <script src="/chatty/webjars/jquery/jquery.min.js"></script>
+    <script th:src="@{/webjars/mdui/dist/js/mdui.js}"></script>
+</head>
+<body>
+<div id="main-content" class="container">
+    <nav class="navbar navbar-dark bg-primary">
+        <a class="navbar-brand text-white background: #22cae3;">Chatty</a>
+        <button onclick="logout()" class="btn btn-outline-light my-2 my-sm-0">Logout</button>
+    </nav>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <span>Welcome : </span><span th:text="${user.name}" style="color:blue" id="username"></span><br/>
+            </div>
+            <div class="form-group">
+                <label for="messageField">Send text</label>
+                <input type="text" id="messageField" class="form-control" placeholder="Enter text here...">
+            </div>
+            <button class="btn btn-outline-info"
+                    onclick="sendMsgToServer()">Send
+            </button>
+        </div>
+        <div class="mdui-col-xs-6 mdui-col-sm-5" style="padding:10px 0">
+            
+
+            <div class="mdui-chip">
+                <span class="mdui-chip-icon mdui-color-blue">
+                	<i class="mdui-icon material-icons">people-group;</i>
+                </span>
+                <span class="mdui-chip-title">Online Users</span>
+                <span class="mdui-chip-title chat-num"></span>
+            </div>
+            
+            
+            <div class="users-container"></div>
+            
+            <div class="mdui-chip">
+                    <span class="mdui-chip-icon mdui-color-blue">
+                        <i class="mdui-icon material-icons">comments-text-outline;</i></span>
+                <span class="mdui-chip-title">Messages</span>
+            </div> 
+            
+            <div class="message-container">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script th:inline="javascript">
+
+    /**
+     * WebSocket Client
+     *
+     * 1、WebSocket client receive messages with callback. example：webSocket.onmessage
+     * 2、WebSocket client send message to server. example：webSocket.send();
+     */
+    function getWebSocket() {
+        /**
+         * WebSocket client PS：URL shows WebSocket protocal, port number, and then end point.
+         */
+        var user = $('#username').text();
+        var uri = 'ws://localhost:8081/chatty/chat/' + user;
+        var webSocket = new WebSocket(uri);
+        /**
+         * websocket open connection.
+         */
+        webSocket.onopen = function (event) {
+            console.log('WebSocket open connection');
+        };
+
+        /**
+         * Server send 1) broadcast message, 2) online users.
+         */
+        webSocket.onmessage = function (event) {
+            var message = JSON.parse(event.data) || {};
+            console.log('WebSocket Receives：%c' + message.msg, 'color:green');
+            //Receive Message from Server
+            var $messageContainer = $('.message-container');
+            if (message.type === 'SPEAK') {
+                $messageContainer.append(
+                    '<div class="mdui-card" style="margin: 10px 0;border-radius: 30px">' +
+                    '<div class="mdui-card-primary">' +
+                    '<div class="mdui-card-content message-content">' + message.userName + "：" + message.msg + '</div>' +
+                    '</div></div>');
+            }
+            $('.chat-num').text(message.onlineCount);
+            if(message.onlineCount > 0) {
+				var usersUl = `<ul>`;
+				console.log("isArray:" + Array.isArray(message.users));
+				for(let i=0; i<message.users.length; i++) {
+					usersUl = usersUl + `<li>` + message.users[i] + `</li>`;
+				}
+				usersUl = usersUl + `</ul>`;
+				$('.users-container').html(usersUl);
+			}
+            var $cards = $messageContainer.children('.mdui-card:visible').toArray();
+            if ($cards.length > 5) {
+                $cards.forEach(function (item, index) {
+                    index < $cards.length - 5 && $(item).slideUp('fast');
+                });
+            }
+        };
+
+        /**
+         * Close connection
+         */
+        webSocket.onclose = function (event) {
+            console.log('WebSocket close connection.');
+        };
+
+        /**
+         * Exception
+         */
+        webSocket.onerror = function (event) {
+            console.log('WebSocket exception.');
+        };
+        return webSocket;
+    }
+
+    var webSocket = getWebSocket();
+
+
+    /**
+     * Send messages to server use webSocket.
+     */
+    function sendMsgToServer() {
+        var $message = $('#messageField');
+        if ($message.val()) {
+            webSocket.send(JSON.stringify({userName: $('#username').text(), msg: $message.val()}));
+            $message.val(null);
+        }
+    }
+
+
+    /**
+     * Enter to send message.
+     */
+    document.onkeydown = function (event) {
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        e.keyCode === 13 && sendMsgToServer();
+    };
+
+    /**
+     * Logout.
+     */
+    function logout() {
+        location.replace("/chatty");
+        webSocket.close();
+    }
+
+</script>
+
+</body>
+</html>
